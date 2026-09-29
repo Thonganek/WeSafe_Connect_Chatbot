@@ -437,10 +437,124 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.7)}70%{box-shadow:0 0 0 8px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
   @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.45}40%{transform:translateY(-5px);opacity:1}}
   @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}}
+  /* =====================================================================
+     AI Hologram layer — ใช้พาเลตเดิม (teal #0D9488 · sky #0284C7 · violet #7C3AED)
+     ===================================================================== */
+  @property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+  :root{
+    --h1:#2DD4BF;--h2:#38BDF8;--h3:#A78BFA;
+    --holo-line:rgba(2,132,199,.20);
+    --hud:rgba(13,148,136,.55);
+    --grad-flow:linear-gradient(90deg,#0F766E,#0369A1 33%,#6D28D9 66%,#0F766E);
+    --grad-flow-b:linear-gradient(90deg,#0D9488,#0284C7 33%,#6D28D9 66%,#0D9488);
+    --line-flow:linear-gradient(90deg,var(--h1),var(--h2) 33%,var(--h3) 66%,var(--h1));
+    --neon:0 0 0 1px rgba(45,212,191,.35),0 0 18px -2px rgba(56,189,248,.45),0 0 40px -10px rgba(124,58,237,.45);
+  }
+
+  /* ---- ฉากหลัง: พื้นกริดโฮโลแกรม + ฝุ่นแสง + เส้นสแกน ---- */
+  .holo{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+  .holo b{position:absolute;display:block}
+  .holo .floor{left:-60%;right:-60%;bottom:0;height:60vh;background-image:linear-gradient(var(--holo-line) 1px,transparent 1px),linear-gradient(90deg,var(--holo-line) 1px,transparent 1px);background-size:60px 60px;transform:perspective(380px) rotateX(64deg);transform-origin:50% 100%;-webkit-mask-image:linear-gradient(to top,#000 5%,transparent 80%);mask-image:linear-gradient(to top,#000 5%,transparent 80%);animation:hgrid 5s linear infinite}
+  .holo .horizon{left:0;right:0;bottom:calc(60vh * .26);height:1px;background:linear-gradient(90deg,transparent,var(--h2) 30%,var(--h3) 70%,transparent);opacity:.5;box-shadow:0 0 18px 2px rgba(56,189,248,.35)}
+  .holo .dust{inset:0;background-image:radial-gradient(circle,rgba(13,148,136,.55) 1px,transparent 1.7px),radial-gradient(circle,rgba(124,58,237,.42) 1px,transparent 1.7px),radial-gradient(circle,rgba(2,132,199,.5) 1.3px,transparent 2.2px);background-size:140px 140px,210px 210px,420px 420px;background-position:0 0,40px 70px,120px 30px;opacity:.75;animation:hdust 38s linear infinite}
+  .holo .scan{left:0;right:0;top:0;height:22vh;background:linear-gradient(180deg,transparent,rgba(56,189,248,.06) 60%,rgba(45,212,191,.2) 98%,transparent);animation:hscan 10s linear infinite}
+
+  /* ---- ข้อความไล่สีแบบไหล ---- */
+  .gt,.brand .nm span,.drawer h4{background-image:var(--grad-flow);background-size:200% 100%;animation:hflow 7s linear infinite}
+  .kicker::before{content:"";display:inline-block;width:6px;height:6px;margin-right:8px;border-radius:50%;background:currentColor;vertical-align:2px;box-shadow:0 0 0 3px rgba(13,148,136,.15),0 0 10px currentColor;animation:blink 1.6s infinite}
+
+  /* ---- header: เส้นแสงวิ่ง ---- */
+  header::after{height:2px;background:var(--line-flow);background-size:600px 100%;opacity:.9;box-shadow:0 0 12px rgba(56,189,248,.55);animation:hline 4s linear infinite}
+
+  /* ---- orb: วงแหวนโคจรแบบโฮโลแกรม ---- */
+  .orb::before{content:"";position:absolute;inset:-8px;border-radius:50%;border:1px dashed rgba(2,132,199,.45);animation:spin 14s linear infinite reverse;pointer-events:none}
+  .orb img{animation:hflick 7s infinite}
+  .orb.xl{box-shadow:0 0 0 1px rgba(45,212,191,.35),0 0 50px -6px rgba(45,212,191,.55),0 0 90px -20px rgba(124,58,237,.6)}
+  .orb.xl::before{inset:-20px;border:1.5px solid transparent;border-top-color:var(--h1);border-bottom-color:var(--h3);border-left-color:rgba(56,189,248,.55);border-right-color:rgba(56,189,248,.55);box-shadow:0 0 14px rgba(56,189,248,.45);animation:horbit 5s linear infinite}
+  .intro .orb::before{border-color:rgba(255,255,255,.55)}
+  .intro .orb.xl::before{border-top-color:#fff;border-bottom-color:rgba(255,255,255,.7);border-left-color:rgba(255,255,255,.35);border-right-color:rgba(255,255,255,.35);box-shadow:0 0 14px rgba(255,255,255,.5)}
+
+  /* ---- การ์ดกระจกโฮโลแกรม: ขอบแสงหมุน + มุม HUD + เส้นสแกน ---- */
+  .card::before,.chat::before{background:conic-gradient(from var(--ang),var(--h1),var(--h2) 15%,var(--h3) 30%,rgba(167,139,250,0) 45%,rgba(45,212,191,0) 70%,var(--h1));opacity:.85;animation:hang 7s linear infinite}
+  .chat{position:relative}
+  .chat::before{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;padding:1px;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+  .card::after,.chat::after,.mbox::after{content:"";position:absolute;inset:12px;z-index:2;pointer-events:none;background:
+    linear-gradient(var(--hud),var(--hud)) top left/18px 2px,linear-gradient(var(--hud),var(--hud)) top left/2px 18px,
+    linear-gradient(var(--hud),var(--hud)) top right/18px 2px,linear-gradient(var(--hud),var(--hud)) top right/2px 18px,
+    linear-gradient(var(--hud),var(--hud)) bottom left/18px 2px,linear-gradient(var(--hud),var(--hud)) bottom left/2px 18px,
+    linear-gradient(var(--hud),var(--hud)) bottom right/18px 2px,linear-gradient(var(--hud),var(--hud)) bottom right/2px 18px;background-repeat:no-repeat;opacity:.8}
+  .sp h5{display:flex;align-items:center;gap:8px}
+  .sp h5::before{content:"";flex:none;width:14px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--h1),var(--h3));box-shadow:0 0 8px rgba(56,189,248,.8)}
+  .mbox::before{background:var(--line-flow);background-size:600px 100%;animation:hline 4s linear infinite;box-shadow:0 0 14px rgba(56,189,248,.6)}
+
+  /* ---- แผงแบรนด์ซ้าย: กริด + สแกนไลน์ ---- */
+  .intro::before{inset:0;width:auto;height:auto;border-radius:0;background:linear-gradient(rgba(255,255,255,.11) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,rgba(255,255,255,.11) 1px,transparent 1px) 0 0/28px 28px;-webkit-mask-image:radial-gradient(ellipse 95% 70% at 70% 8%,#000 15%,transparent 75%);mask-image:radial-gradient(ellipse 95% 70% at 70% 8%,#000 15%,transparent 75%)}
+  .intro::after{left:0;right:0;top:0;bottom:auto;width:auto;height:130px;border-radius:0;background:linear-gradient(180deg,transparent,rgba(255,255,255,.12) 80%,rgba(255,255,255,.4) 99%,transparent);animation:hscanin 7s linear infinite}
+
+  /* ---- ลำแสงโปรเจกเตอร์ใต้ AI orb ในหน้าแชท ---- */
+  .empty{position:relative}
+  .empty .orb.xl{z-index:1;margin-bottom:46px}
+  .empty::before{content:"";position:absolute;left:50%;top:44px;width:170px;height:90px;transform:translateX(-50%);background:linear-gradient(to top,rgba(56,189,248,.32),rgba(45,212,191,.1) 60%,transparent);clip-path:polygon(33% 100%,67% 100%,100% 0,0 0);animation:hflick 5s infinite;pointer-events:none}
+  .empty::after{content:"";position:absolute;left:50%;top:126px;width:110px;height:16px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(56,189,248,.65),rgba(45,212,191,.25) 45%,transparent 70%);box-shadow:0 0 26px rgba(56,189,248,.4);pointer-events:none}
+  @media(max-width:860px){.empty::before,.empty::after{display:none}}
+
+  /* ---- ปุ่ม / แถบความคืบหน้า ---- */
+  .btn.pri,.composer button,.chip.pri-on,.lineage span:last-child,.learnitem button{background-image:var(--grad-flow-b);background-size:200% 100%;animation:hflow 6s linear infinite}
+  .btn.pri:hover:not(:disabled),.composer button:hover{box-shadow:var(--neon)}
+  .pbar i{position:relative;overflow:hidden}
+  .pbar i.done{background-image:var(--line-flow);background-size:600px 100%;animation:hline 3s linear infinite;box-shadow:0 0 10px rgba(56,189,248,.6)}
+
+  /* ---- ประกายโฮโลแกรมเมื่อชี้ ---- */
+  .rolebtn,.feat,.learnitem,.qp{position:relative;overflow:hidden}
+  .rolebtn::after,.feat::after,.learnitem::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(110deg,transparent 35%,rgba(56,189,248,.16) 47%,rgba(167,139,250,.16) 53%,transparent 65%);transform:translateX(-100%);transition:transform .9s var(--ease)}
+  .rolebtn:hover::after,.feat:hover::after,.learnitem:hover::after{transform:translateX(100%)}
+  .rolebtn.on{box-shadow:0 0 0 1px var(--ac),0 0 26px -6px var(--ac),0 14px 32px -16px var(--ac)}
+  .chip.on,.mood.on{box-shadow:0 0 0 1px var(--brand),0 0 18px -6px var(--h2)}
+  .bnav button.on{box-shadow:inset 0 0 0 1px var(--brand),0 0 16px -6px var(--h2)}
+
+  /* ---- แชท ---- */
+  .umsg{background-image:var(--grad-flow-b);background-size:200% 100%;box-shadow:0 0 0 1px rgba(45,212,191,.25),0 14px 28px -16px rgba(2,132,199,.8),0 0 24px -12px rgba(124,58,237,.6)}
+  .abody{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(240,250,252,.9));border-color:rgba(2,132,199,.18);box-shadow:var(--shadow-sm),inset 0 1px 0 #fff}
+  .abody::before{content:"";position:absolute;left:-1px;top:14px;bottom:14px;width:2px;border-radius:2px;background:linear-gradient(var(--h1),var(--h2),var(--h3));box-shadow:0 0 10px rgba(56,189,248,.7)}
+  .amsg .av{animation:havp 3.2s ease-in-out infinite}
+  .typing{background:linear-gradient(90deg,var(--muted) 40%,var(--brand-2) 50%,var(--muted) 60%) 0 0/300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:hflow 2.4s linear infinite}
+  .composer{position:relative}
+  .composer::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;background:conic-gradient(from var(--ang),var(--h1),var(--h2),var(--h3),transparent 40%,transparent 70%,var(--h1));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s;animation:hang 3s linear infinite;pointer-events:none}
+  .composer:focus-within::before{opacity:1}
+
+  /* ---- ไอคอนเส้น (SVG) แทนอีโมจิในเมนู ---- */
+  .ico{display:block;flex:none;width:1em;height:1em}
+  .hbtn .i{display:grid;place-items:center;font-size:16px}
+  .hbtn.app{color:var(--gold)}.hbtn.app .t{color:var(--text)}
+  .exitbtn .ico{width:15px;height:15px}
+  .li{display:inline-grid;place-items:center;vertical-align:-2px;margin-right:6px;font-size:1.1em}
+  .ic .ico,.feat .i .ico,.li .ico{stroke:url(#hg)}
+  .rolebtn .ic .ico,.as-who .ic .ico{stroke:currentColor}
+  .rolebtn .ic,.as-who .ic{color:var(--ac)}
+  .sg.risk h4 .ic .ico{stroke:currentColor}
+  .learnitem .ic,.feat .i,.safeitem .ic,.tl .ic,.sg h4 .ic,.rolebtn .ic,.as-who .ic{box-shadow:inset 0 0 0 1px rgba(255,255,255,.6),0 0 14px -6px rgba(56,189,248,.7)}
+  .sgtabs button .i,.bnav button .i{display:grid;place-items:center}
+  .bnav button.on .ico{stroke:url(#hg)}
+  .sbtn,.more{display:inline-flex;align-items:center;justify-content:center}
+  .sbtn .li,.more .li{margin-right:5px}
+  .modchip .ico,.deeplink .ico,.ragchip .ico,.qp .ico,.sugg .ico{display:inline-block;width:1.1em;height:1.1em;vertical-align:-3px;margin-right:3px}
+
+  @keyframes hgrid{to{background-position:0 60px,0 0}}
+  @keyframes hdust{to{background-position:0 -420px,40px -350px,120px -390px}}
+  @keyframes hscan{from{transform:translateY(-22vh)}to{transform:translateY(122vh)}}
+  @keyframes hscanin{from{transform:translateY(-140px)}to{transform:translateY(920px)}}
+  @keyframes hflow{to{background-position:200% 0}}
+  @keyframes hline{to{background-position:600px 0}}
+  @keyframes hang{to{--ang:360deg}}
+  @keyframes horbit{from{transform:rotateX(72deg) rotateZ(0)}to{transform:rotateX(72deg) rotateZ(360deg)}}
+  @keyframes hflick{0%,100%{opacity:1}46%{opacity:1}47%{opacity:.72}48%{opacity:1}73%{opacity:.9}74%{opacity:1}}
+  @keyframes havp{50%{box-shadow:0 0 0 2px var(--h2),0 0 16px 0 rgba(45,212,191,.7)}}
 </style>
 </head>
 <body>
 <div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="holo" aria-hidden="true"><b class="floor"></b><b class="horizon"></b><b class="dust"></b><b class="scan"></b></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><linearGradient id="hg" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="24"><stop offset="0" stop-color="#0D9488"/><stop offset=".55" stop-color="#0284C7"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs></svg>
 <div class="hotbar" id="hotbar"></div>
 <header>
   <div class="hin">
@@ -745,7 +859,49 @@ const u=()=>UI[S.lang];
 const ROLE_AC={A:"#0284C7",B:"#0D9488",CP:"#7C3AED"};
 const SEND_ICON=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>`;
 let FRESH=true,LAST_STEP=null; // FRESH = เพิ่งเปลี่ยนหน้า (เล่นแอนิเมชันเฉพาะตอนเปลี่ยนหน้า ไม่ใช่ทุกครั้งที่กดเลือก)
-function splitIcon(s){const m=s.match(/^(\p{Extended_Pictographic}️?)\s*/u);return m?[m[1],s.slice(m[0].length)]:["•",s];}
+// ===== ไอคอนเส้นแบบสากล (อ้างอิงชุด Lucide) ใช้แทนอีโมจิในเมนู — คีย์คืออีโมจิเดิมในข้อความ =====
+const ICON_SET={
+ "📚":'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+ "📖":'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+ "📞":'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+ "☎️":'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+ "🚪":'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+ "⚙️":'<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+ "🕊️":'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+ "↩":'<path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/>',
+ "✅":'<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+ "🏥":'<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>',
+ "🤖":'<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+ "🕵️":'<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><path d="m2 2 20 20"/>',
+ "🌐":'<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+ "🧒":'<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
+ "⚠️":'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+ "⚖️":'<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',
+ "🤝":'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+ "🔄":'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+ "💞":'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+ "💗":'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/>',
+ "☠️":'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="m12 13-1-1 2-2-3-3 2-2"/>',
+ "💙":'<circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/>',
+ "🩺":'<path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/>',
+ "🎯":'<path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/>',
+ "💢":'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+ "🛑":'<path d="M12 16h.01"/><path d="M12 8v4"/><path d="M15.31 2a2 2 0 0 1 1.42.59l4.68 4.68A2 2 0 0 1 22 8.69v6.62a2 2 0 0 1-.59 1.42l-4.68 4.68a2 2 0 0 1-1.42.59H8.69a2 2 0 0 1-1.42-.59l-4.68-4.68A2 2 0 0 1 2 15.31V8.69a2 2 0 0 1 .59-1.42l4.68-4.68A2 2 0 0 1 8.69 2z"/>',
+ "🧩":'<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+ "💬":'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+ "🗺️":'<path d="M14.11 5.55a2 2 0 0 0 1.78 0l3.66-1.83A1 1 0 0 1 21 4.62v12.76a1 1 0 0 1-.55.9l-4.56 2.27a2 2 0 0 1-1.78 0l-4.22-2.1a2 2 0 0 0-1.78 0l-3.66 1.83A1 1 0 0 1 3 19.38V6.62a1 1 0 0 1 .55-.9l4.56-2.27a2 2 0 0 1 1.78 0z"/><path d="M15 5.76v15"/><path d="M9 3.24v15"/>',
+ "🌱":'<path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>',
+ "📘":'<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>',
+ "🔎":'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+ "ℹ️":'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+ "🚨":'<path d="M7 18v-6a5 5 0 1 1 10 0v6"/><path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z"/><path d="M21 12h1"/><path d="M18.5 4.5 18 5"/><path d="M2 12h1"/><path d="M12 2v1"/><path d="m4.93 4.93.7.7"/><path d="M12 12v6"/>'
+};
+const ICONS=Object.fromEntries(Object.entries(ICON_SET).map(([k,v])=>[k.replace(/\uFE0F/g,""),v]));
+// อีโมจิ → SVG (ถ้าไม่มีในชุดจะคืนอีโมจิเดิม)
+function ico(e){const p=ICONS[(e||"").replace(/\uFE0F/g,"")];return p?`<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`:e;}
+// ป้ายข้อความที่ขึ้นต้นด้วยอีโมจิ → ไอคอนเส้น + ข้อความ
+function lbl(s){const m=s.match(/^(\p{Extended_Pictographic}\uFE0F?)\s*/u);return m?`<span class="li">${ico(m[1])}</span>${s.slice(m[0].length)}`:s;}
+function splitIcon(s){const m=s.match(/^(\p{Extended_Pictographic}️?)\s*/u);return m?[ico(m[1]),s.slice(m[0].length)]:["•",s];}
 function telItem(n,l,cls){return /^\d+$/.test(n)?`<a class="${cls}" href="tel:${n}"><b>${n}</b><span>${l}</span></a>`:`<div class="${cls}"><b>${n}</b><span>${l}</span></div>`;}
 // ข้อความแจ้งว่าคุยกับ AI: ส่วนหัวตัวหนาแสดงเสมอ ส่วนที่เหลือซ่อนได้บนจอเล็ก
 function aiHTML(){const s=t().ai,k=s.indexOf("</b>")+4;return k>3?s.slice(0,k)+`<span class="rest">${s.slice(k)}</span>`:s;}
@@ -781,10 +937,10 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawers();$("p
 
 function renderDrawers(){
  const L=$("drawerLearn");
- L.innerHTML=`<h4>${t().learnT}</h4><div class="row">${LEARN.map((tp,i)=>`<div class="learnitem"><div class="top"><span class="ic">${tp.icon}</span><span>${S.lang==="th"?tp.th:tp.en}</span></div><div class="acts"><button onclick="sendMsg(LEARN[${i}].ask)">${t().brief}</button><a href="${MODULES[tp.mod].link}" target="_blank" rel="noreferrer">${t().open} ↗</a></div></div>`).join("")}</div>`;
+ L.innerHTML=`<h4>${lbl(t().learnT)}</h4><div class="row">${LEARN.map((tp,i)=>`<div class="learnitem"><div class="top"><span class="ic">${ico(tp.icon)}</span><span>${S.lang==="th"?tp.th:tp.en}</span></div><div class="acts"><button onclick="sendMsg(LEARN[${i}].ask)">${t().brief}</button><a href="${MODULES[tp.mod].link}" target="_blank" rel="noreferrer">${t().open} ↗</a></div></div>`).join("")}</div>`;
  const R=$("drawerRes");
- R.innerHTML=`<h4>${t().hotT}</h4><div class="row">${t().rl.map(([n,l])=>telItem(n,l,"resitem")).join("")}</div>
- <h4 style="margin-top:20px">${t().ngoT}</h4><div class="row">${NGOS.map(n=>`<div class="ngo"><span>${S.lang==="th"?n.th:n.en}</span><a href="${APP_URL}/resources" target="_blank" rel="noreferrer">${t().ngoLink}</a></div>`).join("")}</div>`;
+ R.innerHTML=`<h4>${lbl(t().hotT)}</h4><div class="row">${t().rl.map(([n,l])=>telItem(n,l,"resitem")).join("")}</div>
+ <h4 style="margin-top:20px">${lbl(t().ngoT)}</h4><div class="row">${NGOS.map(n=>`<div class="ngo"><span>${S.lang==="th"?n.th:n.en}</span><a href="${APP_URL}/resources" target="_blank" rel="noreferrer">${t().ngoLink}</a></div>`).join("")}</div>`;
 }
 
 // ---------- onboarding: 5 หน้าจอสั้นๆ แต่ละหน้าพอดีหนึ่งจอ (ปุ่มถัดไป/ย้อนกลับอยู่ล่างการ์ดเสมอ) ----------
@@ -818,7 +974,7 @@ function onboarding(){
 function step0(){const ln=t().ob1l.split("→").map(s=>s.trim());return [`
  <div class="mhero"><div class="orb xl"><img src="${LOGO}" alt="WeSafe"></div><div><h1 class="gt">${t().ob1t}</h1><p>${t().ob1g}</p></div></div>
  <h2 class="h2 gt dk">${u().aboutT}</h2>
- <div class="feats">${u().feats.map(([i,b,s])=>`<div class="feat"><span class="i">${i}</span><div><b>${b}</b><span>${s}</span></div></div>`).join("")}</div>
+ <div class="feats">${u().feats.map(([i,b,s])=>`<div class="feat"><span class="i">${ico(i)}</span><div><b>${b}</b><span>${s}</span></div></div>`).join("")}</div>
  <p class="lead about">${t().ob1b}</p><button class="moreb" onclick="this.previousElementSibling.classList.add('open');this.remove()">${u().more}</button>
  <div class="lineage">${ln.map((s,i)=>`${i?"<em>→</em>":""}<span>${s}</span>`).join("")}</div>`,
  `<button class="btn pri" style="flex:1" onclick="go(1)">${t().next} <span aria-hidden="true">→</span></button>`];}
@@ -833,7 +989,7 @@ function stepWho(){return [`
  <p class="subq" style="margin-bottom:16px">${t().ob3s}</p>
  <div class="roles">
   ${Object.entries(AGENTS).map(([k,a])=>`<button class="rolebtn ${S.agent===k?"on":""}" style="--ac:${ROLE_AC[k]||a.color}" aria-pressed="${S.agent===k}" onclick="S.agent='${k}';render()">
-   <span class="ic">${a.icon}</span><span><span class="tt">${S.lang==="th"?a.nt:a.ne}</span><span class="qq">“${S.lang==="th"?a.st:a.se}”</span></span><span class="ck">✓</span></button>`).join("")}</div>
+   <span class="ic">${ico(a.icon)}</span><span><span class="tt">${S.lang==="th"?a.nt:a.ne}</span><span class="qq">“${S.lang==="th"?a.st:a.se}”</span></span><span class="ck">✓</span></button>`).join("")}</div>
  ${S.agent?"":`<div class="hint">${u().hint}</div>`}`,
  BACK(1)+NEXT(3,!S.agent)];}
 
@@ -846,8 +1002,8 @@ function stepSigns(){const[q,src]=splitQ(t().sg);const L=S.lang==="th";const tab
  ${src?`<p class="subq">${src}</p>`:""}
  <div class="sgtop"><span class="sgnote">${u().sgNote} · <span class="hidot">!</span> ${u().hiLegend}</span><span class="picked">${u().picked(S.signs.length)}</span></div>
  ${hi?`<div class="hialert"><span>⚠️ <i class="long">${u().hiAlert}</i><i class="short">${u().hiAlertS}</i></span><a href="tel:191">191</a><a href="tel:1300">1300</a></div>`:""}
- <div class="sgtabs" role="tablist">${SGROUPS.map(g=>`<button role="tab" aria-selected="${tab===g.k}" class="${tab===g.k?"on":""} ${g.k}" onclick="S.sgTab='${g.k}';render()"><span class="i">${g.i}</span><span>${L?g.sth:g.sen}</span>${cnt(g.k)?`<b>${cnt(g.k)}</b>`:""}</button>`).join("")}</div>
- <div class="sgrid">${SGROUPS.map(g=>`<div class="sg ${g.k} ${tab===g.k?"act":""}"><h4><span class="ic">${g.i}</span>${L?g.th:g.en}</h4><p>${L?g.dth:g.den}</p>
+ <div class="sgtabs" role="tablist">${SGROUPS.map(g=>`<button role="tab" aria-selected="${tab===g.k}" class="${tab===g.k?"on":""} ${g.k}" onclick="S.sgTab='${g.k}';render()"><span class="i">${ico(g.i)}</span><span>${L?g.sth:g.sen}</span>${cnt(g.k)?`<b>${cnt(g.k)}</b>`:""}</button>`).join("")}</div>
+ <div class="sgrid">${SGROUPS.map(g=>`<div class="sg ${g.k} ${tab===g.k?"act":""}"><h4><span class="ic">${ico(g.i)}</span>${L?g.th:g.en}</h4><p>${L?g.dth:g.den}</p>
   <div class="chips">${SIGNS.map((s,i)=>s[2]!==g.k?"":`<button class="chip ${s[3]?"hi":""} ${S.signs.includes(i)?"on":""}" aria-pressed="${S.signs.includes(i)}" onclick="togSign(${i})">${S.signs.includes(i)?"✓ ":""}${L?s[0]:s[1]}</button>`).join("")}</div></div>`).join("")}</div>`,
  BACK(2)+NEXT(4)];}
 
@@ -866,12 +1022,12 @@ function bnav(){const b=(id,label,fn)=>{const[i,tx]=splitIcon(label);return `<bu
 
 function sidebar(a,ac){return `<aside class="side">
  <div class="sp role" style="--ac:${ac}">
-  <div class="as-who"><span class="ic">${a.icon}</span><div><div class="tt">${S.lang==="th"?a.nt:a.ne}</div><div class="sb"><i></i>WeSafe Connect · ${u().online}</div></div></div>
-  <div class="sbtns"><button class="sbtn" onclick="switchAgent()">${t().sw}</button><button class="sbtn ok" onclick="openPost()">${t().end}</button></div></div>
+  <div class="as-who"><span class="ic">${ico(a.icon)}</span><div><div class="tt">${S.lang==="th"?a.nt:a.ne}</div><div class="sb"><i></i>WeSafe Connect · ${u().online}</div></div></div>
+  <div class="sbtns"><button class="sbtn" onclick="switchAgent()">${lbl(t().sw)}</button><button class="sbtn ok" onclick="openPost()">${lbl(t().end)}</button></div></div>
  <div class="sp"><h5>${t().lives}</h5><div class="lvl">${LIVES.map(l=>`<div><b>${l[0]}</b>${S.lang==="th"?l[1]:l[2]}</div>`).join("")}</div></div>
- <div class="sp"><h5>${t().learnT}</h5><div class="tl">${LEARN.map((tp,i)=>`<button onclick="sendMsg(LEARN[${i}].ask)"><span class="ic">${tp.icon}</span><span>${S.lang==="th"?tp.th:tp.en}</span></button>`).join("")}</div></div>
- <div class="sp"><h5>${t().hotT}</h5><div class="hl">${t().rl.map(([n,l])=>telItem(n,l,"")).join("")}</div>
-  <button class="more" onclick="toggleDrawer('res')">${t().ngoT} →</button></div>
+ <div class="sp"><h5>${lbl(t().learnT)}</h5><div class="tl">${LEARN.map((tp,i)=>`<button onclick="sendMsg(LEARN[${i}].ask)"><span class="ic">${ico(tp.icon)}</span><span>${S.lang==="th"?tp.th:tp.en}</span></button>`).join("")}</div></div>
+ <div class="sp"><h5>${lbl(t().hotT)}</h5><div class="hl">${t().rl.map(([n,l])=>telItem(n,l,"")).join("")}</div>
+  <button class="more" onclick="toggleDrawer('res')">${lbl(t().ngoT)} →</button></div>
 </aside>`;}
 
 function screen3(){const a=AGENTS[S.agent];const qs=S.lang==="th"?a.pt:a.pe;const ac=ROLE_AC[S.agent]||a.color;return `
@@ -886,12 +1042,12 @@ function screen3(){const a=AGENTS[S.agent];const qs=S.lang==="th"?a.pt:a.pe;cons
     <h2 class="h2 gt">${u().hi}</h2>
     <p>${u().hiSub}</p>
     <div class="quick-t">${t().qt}</div>
-    <div class="qgrid">${qs.map((p,i)=>{const urg=p.startsWith("🚨");return `<button class="qp ${urg?"urgent":""}" ${urg?"":`style="--ac:${ac}"`} onclick="sendQuick(${i})">${p}</button>`;}).join("")}</div></div>
+    <div class="qgrid">${qs.map((p,i)=>{const urg=p.startsWith("🚨");return `<button class="qp ${urg?"urgent":""}" ${urg?"":`style="--ac:${ac}"`} onclick="sendQuick(${i})"><span>${lbl(p)}</span></button>`;}).join("")}</div></div>
    <div id="msgs" aria-live="polite"></div>
    <p class="disc">${t().disc}</p>
   </div>
   <div class="dockbar">
-   <div id="sugg" class="sugg ${S.msgs.length?"":"hidden"}">${qs.map((p,i)=>`<button class="${p.startsWith("🚨")?"urgent":""}" onclick="sendQuick(${i})">${p}</button>`).join("")}</div>
+   <div id="sugg" class="sugg ${S.msgs.length?"":"hidden"}">${qs.map((p,i)=>`<button class="${p.startsWith("🚨")?"urgent":""}" onclick="sendQuick(${i})">${lbl(p)}</button>`).join("")}</div>
    <div class="composer"><textarea id="inp" rows="1" placeholder="${t().ph}" oninput="grow(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();sendMsg()}"></textarea><button onclick="sendMsg()" aria-label="${t().send}" title="${t().send}">${SEND_ICON}</button></div>
    <div class="keys">${u().keys}</div>
   </div>
@@ -905,11 +1061,11 @@ function msgHTML(m){
  if(m.role==="user")return `<div class="umsg">${esc(m.content)}</div>`;
  const{mod,body}=parseMod(m.content);const M=mod&&MODULES[mod];const out=mod==="นอกคู่มือ";
  let chips="";
- if(M)chips+=`<span class="modchip ${out?"out":""}">${M.icon} ${out?t().outChip:`${t().kb} • ${S.lang==="th"?mod:M.en}`}</span>`;
- if(m.rag&&m.rag.length)chips+=`<span class="ragchip">🔎 ${t().rag}: ${m.rag.join(" • ")}</span>`;
- if(m.demo)chips+=`<span class="ragchip demo">📖 ${t().demoChip}</span>`;
+ if(M)chips+=`<span class="modchip ${out?"out":""}">${ico(M.icon)} ${out?t().outChip:`${t().kb} • ${S.lang==="th"?mod:M.en}`}</span>`;
+ if(m.rag&&m.rag.length)chips+=`<span class="ragchip">${ico("🔎")} ${t().rag}: ${m.rag.join(" • ")}</span>`;
+ if(m.demo)chips+=`<span class="ragchip demo">${ico("📖")} ${t().demoChip}</span>`;
  let link="";
- if(M&&M.link&&!out)link=`<a class="deeplink" href="${M.link}" target="_blank" rel="noreferrer">🕊️ ${S.lang==="th"?M.lt:M.le} ↗</a>`;
+ if(M&&M.link&&!out)link=`<a class="deeplink" href="${M.link}" target="_blank" rel="noreferrer">${ico("🕊️")} ${S.lang==="th"?M.lt:M.le} ↗</a>`;
  return `<div class="amsg"><img class="av" src="${LOGO}" alt=""><div class="acol"><div class="ahead"><span class="nm">WeSafe Connect</span><span class="ai">AI</span>${chips}</div><div class="abody">${clean(esc(body))}</div>${link}</div></div>`;
 }
 function renderMsgs(){const box=$("msgs");if(!box)return;box.innerHTML=S.msgs.map(msgHTML).join("");
